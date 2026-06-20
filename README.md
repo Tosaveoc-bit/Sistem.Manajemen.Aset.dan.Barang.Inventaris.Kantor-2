@@ -8,165 +8,139 @@
 
 ## Entitas dan Relasi
 
-```text
-USERS
-│
-├── id_user (PK)
-├── nama_user
-├── username
-├── password
-└── role
+## Diagram Erd
 
-        1
-        │
-        │
-        N
-
-PEMINJAMAN
-├── id_peminjaman (PK)
-├── id_aset (FK)
-├── id_user (FK)
-├── tanggal_pinjam
-├── tanggal_kembali
-└── status_peminjaman
-
-        N
-        │
-        │
-        1
-
-ASET
-├── id_aset (PK)
-├── kode_aset
-├── nama_aset
-├── id_kategori (FK)
-├── id_lokasi (FK)
-├── tanggal_pengadaan
-├── nilai_aset
-├── kondisi
-└── status
-
-        │
-   ┌────┴────┐
-   │         │
-   │         │
-   1         1
-   │         │
-   N         N
-
-KATEGORI     LOKASI
-├── id_kategori(PK)   ├── id_lokasi(PK)
-├── nama_kategori     ├── nama_lokasi
-└── deskripsi         └── keterangan
-
-        1
-        │
-        │
-        N
-
-PERAWATAN
-├── id_perawatan (PK)
-├── id_aset (FK)
-├── tanggal_perawatan
-├── jenis_perawatan
-├── biaya
-└── keterangan
-```
+![Erd Diagram](usecase1.png)
 
 ---
 
 # 2. Penjelasan Entitas dan Relasi
 
-## 2.1 Entitas Users
+## 2.1 Entitas USERS
 
-Menyimpan data pengguna yang dapat mengakses sistem.
+Entitas USERS digunakan untuk menyimpan data pengguna yang dapat mengakses Sistem Manajemen Aset dan Barang Inventaris Kantor. Data yang disimpan meliputi identitas pengguna, username, password, dan hak akses (role).
+
+Atribut:
+
+* id_user (Primary Key)
+* nama_user
+* username
+* password
+* role
 
 Relasi:
+Entitas USERS memiliki hubungan dengan entitas PEMINJAMAN melalui relasi "Melakukan". Satu pengguna dapat melakukan banyak peminjaman aset, sedangkan satu peminjaman hanya dilakukan oleh satu pengguna.
 
-* Satu user dapat melakukan banyak peminjaman.
-* Relasi:
-
-```text
-Users (1) ----- (N) Peminjaman
-```
+Kardinalitas:
+USERS (1) : (N) PEMINJAMAN
 
 ---
 
-## 2.2 Entitas Kategori
+## 2.2 Entitas PEMINJAMAN
 
-Menyimpan kategori aset.
+Entitas PEMINJAMAN digunakan untuk mencatat seluruh transaksi peminjaman aset yang dilakukan oleh pengguna. Data yang disimpan meliputi aset yang dipinjam, pengguna yang meminjam, tanggal peminjaman, tanggal pengembalian, dan status peminjaman.
 
-Contoh:
+Atribut:
 
-* Elektronik
-* Furniture
-* Kendaraan
+* id_peminjaman (Primary Key)
+* id_aset
+* id_user
+* tanggal_pinjam
+* tanggal_kembali
+* status_peminjaman
 
 Relasi:
+PEMINJAMAN berhubungan dengan USERS melalui relasi "Melakukan" dan berhubungan dengan ASET melalui relasi "Memiliki". Setiap transaksi peminjaman melibatkan satu aset dan satu pengguna.
 
-```text
-Kategori (1) ----- (N) Aset
-```
+Kardinalitas:
 
-Satu kategori dapat memiliki banyak aset.
+* USERS (1) : (N) PEMINJAMAN
+* ASET (1) : (N) PEMINJAMAN
 
 ---
 
-## 2.3 Entitas Lokasi
+## 2.3 Entitas KATEGORI
 
-Menyimpan lokasi penempatan aset.
+Entitas KATEGORI digunakan untuk mengelompokkan aset berdasarkan jenis atau kelompok tertentu. Pengelompokan ini memudahkan pengelolaan dan pencarian data aset.
 
-Contoh:
+Atribut:
 
-* Ruang IT
-* Ruang Administrasi
-* Gudang
+* id_kategori (Primary Key)
+* nama_kategori
+* deskripsi
 
 Relasi:
+KATEGORI berhubungan dengan ASET melalui relasi "Mempunyai". Satu kategori dapat memiliki banyak aset, sedangkan satu aset hanya termasuk dalam satu kategori.
 
-```text
-Lokasi (1) ----- (N) Aset
-```
+Kardinalitas:
+KATEGORI (1) : (N) ASET
 
 ---
 
-## 2.4 Entitas Aset
+## 2.4 Entitas ASET
 
-Merupakan entitas utama yang menyimpan seluruh data inventaris kantor.
+Entitas ASET merupakan entitas utama yang menyimpan seluruh informasi mengenai barang inventaris kantor. Data yang disimpan meliputi identitas aset, kategori, lokasi, tanggal pengadaan, nilai aset, kondisi, dan status aset.
+
+Atribut:
+
+* id_aset (Primary Key)
+* kode_aset
+* nama_aset
+* id_kategori
+* id_lokasi
+* tanggal_pengadaan
+* nilai_aset
+* kondisi
+* status
 
 Relasi:
+ASET berhubungan dengan KATEGORI melalui relasi "Mempunyai", dengan PEMINJAMAN melalui relasi "Memiliki", dengan PERAWATAN melalui relasi "Menerima", dan dengan LOKASI melalui relasi "Menyimpan".
 
-```text
-Kategori (1) ---- (N) Aset
-Lokasi (1) ---- (N) Aset
-Aset (1) ---- (N) Peminjaman
-Aset (1) ---- (N) Perawatan
-```
+Kardinalitas:
+
+* KATEGORI (1) : (N) ASET
+* ASET (1) : (N) PEMINJAMAN
+* ASET (1) : (N) PERAWATAN
+* LOKASI (1) : (N) ASET
 
 ---
 
-## 2.5 Entitas Peminjaman
+## 2.5 Entitas PERAWATAN
 
-Mencatat proses peminjaman aset oleh pegawai.
+Entitas PERAWATAN digunakan untuk mencatat seluruh kegiatan perawatan yang dilakukan terhadap aset. Data yang dicatat meliputi tanggal perawatan, jenis perawatan, biaya, dan keterangan tambahan.
+
+Atribut:
+
+* id_perawatan (Primary Key)
+* id_aset
+* tanggal_perawatan
+* jenis_perawatan
+* biaya
+* keterangan
 
 Relasi:
+PERAWATAN berhubungan dengan ASET melalui relasi "Menerima". Satu aset dapat menerima banyak perawatan, sedangkan satu data perawatan hanya berkaitan dengan satu aset.
 
-```text
-Users (1) ---- (N) Peminjaman
-Aset (1) ---- (N) Peminjaman
-```
+Kardinalitas:
+ASET (1) : (N) PERAWATAN
 
 ---
 
-## 2.6 Entitas Perawatan
+## 2.6 Entitas LOKASI
 
-Mencatat seluruh aktivitas perawatan aset.
+Entitas LOKASI digunakan untuk menyimpan informasi mengenai tempat atau lokasi penyimpanan aset di dalam kantor.
+
+Atribut:
+
+* id_lokasi (Primary Key)
+* nama_lokasi
+* keterangan
 
 Relasi:
+LOKASI berhubungan dengan ASET melalui relasi "Menyimpan". Satu lokasi dapat menyimpan banyak aset, sedangkan satu aset hanya berada pada satu lokasi.
 
-```text
-Aset (1) ---- (N) Perawatan
-```
+Kardinalitas:
+LOKASI (1) : (N) ASET
 
 ---
 
@@ -248,97 +222,172 @@ Aset (1) ---- (N) Perawatan
 
 # 4. Normalisasi
 
-## UNF (Unnormalized Form)
+Normalisasi merupakan proses pengelompokan data ke dalam beberapa tabel agar data tidak berulang (redundansi), lebih terorganisir, serta mudah dikelola, dan di sistem ini normalisasi dilakukan hingga Bentuk Normal Ketiga (3NF).
 
-```text
-DATA_ASET
+## 4.1 Unnormalized Form (UNF)
 
-id_aset
-nama_aset
-kategori
-lokasi
-nama_user
-tanggal_pinjam
-jenis_perawatan
-biaya_perawatan
-```
+Tahap awal, seluruh data aset, pengguna, peminjaman, dan perawatan masih berada dalam satu tabel besar.
 
-Masih terdapat data berulang dan redundansi.
+Contoh:
+
+| id_aset | nama_aset     | kategori   | lokasi   | nama_user | tanggal_pinjam | jenis_perawatan  | biaya  |
+| ------- | ------------- | ---------- | -------- | --------- | -------------- | ---------------- | ------ |
+| A001    | Laptop Lenovo | Elektronik | Ruang IT | Budi      | 01-06-2026     | Service Keyboard | 150000 |
+
+Bentuk ini masih terdapat pengulangan data dan seluruh informasi tersimpan dalam satu tabel.
 
 ---
 
-## 1NF (First Normal Form)
+## 4.2 First Normal Form (1NF)
 
-Memisahkan data menjadi atribut bernilai tunggal.
+Ditahap ini setiap data harus memiliki nilai yang tunggal dan tidak boleh terdapat kelompok data yang berulang.
 
-```text
-ASET
-(id_aset, nama_aset, kategori, lokasi)
+Data mulai dipisahkan berdasarkan jenis informasinya, misalnya data pengguna, data aset, data peminjaman, dan data perawatan.
 
-PEMINJAMAN
-(id_peminjaman, nama_user, tanggal_pinjam)
+### USERS
 
-PERAWATAN
-(id_perawatan, jenis_perawatan, biaya)
-```
+* id_user
+* nama_user
+* username
+* password
+* role
+
+### ASET
+
+* id_aset
+* nama_aset
+* kategori
+* lokasi
+
+### PEMINJAMAN
+
+* id_peminjaman
+* id_user
+* tanggal_pinjam
+
+### PERAWATAN
+
+* id_perawatan
+* jenis_perawatan
+* biaya
+
+Dengan pemisahan ini, data menjadi lebih terstruktur dibandingkan sebelumnya.
 
 ---
 
-## 2NF (Second Normal Form)
+## 4.3 Second Normal Form (2NF)
 
-Menghilangkan ketergantungan parsial.
+Lalu di tahap ini setiap atribut harus bergantung sepenuhnya pada Primary Key masing-masing tabel.
 
-```text
-USERS
-KATEGORI
-LOKASI
-ASET
-PEMINJAMAN
-PERAWATAN
-```
+Data kemudian dipisahkan lebih lanjut agar tidak terjadi ketergantungan parsial. Informasi kategori dan lokasi yang sebelumnya berada pada tabel aset dipisahkan menjadi tabel tersendiri.
 
-Setiap atribut bergantung penuh pada primary key.
+Struktur tabel menjadi:
+
+### USERS
+
+* id_user
+* nama_user
+* username
+* password
+* role
+
+### KATEGORI
+
+* id_kategori
+* nama_kategori
+* deskripsi
+
+### LOKASI
+
+* id_lokasi
+* nama_lokasi
+* keterangan
+
+### ASET
+
+* id_aset
+* nama_aset
+* id_kategori
+* id_lokasi
+
+### PEMINJAMAN
+
+* id_peminjaman
+* id_user
+* id_aset
+* tanggal_pinjam
+
+### PERAWATAN
+
+* id_perawatan
+* id_aset
+* jenis_perawatan
+* biaya
+
+Dengan pemisahan ini, setiap data hanya bergantung pada Primary Key tabel masing-masing.
 
 ---
 
-## 3NF (Third Normal Form)
+## 4.4 Third Normal Form (3NF)
 
-Menghilangkan ketergantungan transitif.
+Terakhir di tahap ini tidak boleh terdapat ketergantungan transitif antar atribut non-key.
 
-Struktur akhir:
+Struktur database akhir yang digunakan dalam sistem adalah:
 
-```text
-USERS
-(id_user, nama_user, username, password, role)
+### USERS
 
-KATEGORI
-(id_kategori, nama_kategori, deskripsi)
+* id_user (PK)
+* nama_user
+* username
+* password
+* role
 
-LOKASI
-(id_lokasi, nama_lokasi, keterangan)
+### KATEGORI
 
-ASET
-(id_aset, kode_aset, nama_aset,
-id_kategori, id_lokasi,
-tanggal_pengadaan, nilai_aset,
-kondisi, status)
+* id_kategori (PK)
+* nama_kategori
+* deskripsi
 
-PEMINJAMAN
-(id_peminjaman, id_aset,
-id_user, tanggal_pinjam,
-tanggal_kembali, status_peminjaman)
+### LOKASI
 
-PERAWATAN
-(id_perawatan, id_aset,
-tanggal_perawatan,
-jenis_perawatan, biaya,
-keterangan)
-```
+* id_lokasi (PK)
+* nama_lokasi
+* keterangan
 
-Database telah memenuhi bentuk normal ketiga (3NF).
+### ASET
+
+* id_aset (PK)
+* kode_aset
+* nama_aset
+* id_kategori (FK)
+* id_lokasi (FK)
+* tanggal_pengadaan
+* nilai_aset
+* kondisi
+* status
+
+### PEMINJAMAN
+
+* id_peminjaman (PK)
+* id_aset (FK)
+* id_user (FK)
+* tanggal_pinjam
+* tanggal_kembali
+* status_peminjaman
+
+### PERAWATAN
+
+* id_perawatan (PK)
+* id_aset (FK)
+* tanggal_perawatan
+* jenis_perawatan
+* biaya
+* keterangan
+
+Dengan struktur tersebut, database telah memenuhi Bentuk Normal Ketiga (3NF) karena setiap atribut bergantung langsung pada Primary Key dan tidak terdapat redundansi data yang tidak diperlukan.
 
 ---
 
 # 5. Revisi Analisis Kebutuhan
 
-Untuk saat ini ada revisi terhadap Progres 1 karena seluruh kebutuhan fungsional, kebutuhan data, dan diagram proses telah sesuai dengan rancangan basis data.
+Untuk saat ini belum ada revisi terhadap Progres 1 karena seluruh kebutuhan fungsional, kebutuhan data, dan diagram proses telah sesuai dengan rancangan basis data.
